@@ -40,10 +40,7 @@ if env['PLATFORM'] == "win32":
                               '$WITH_LIBEVENT/WIN32-Code',
                               '$WITH_LIBEVENT/',
                           ])
-elif env['PLATFORM'] == "linux":
-    libdir = 'lib'
-    if env['TARGET_ARCH'].endswith("64"):
-        libdir = 'lib64'
+elif env['PLATFORM'] == "posix":
     env.Append (
         LIBS     =  [
                         'mama',
@@ -53,15 +50,19 @@ elif env['PLATFORM'] == "linux":
                         'wombatcommon',
                     ],
         LIBPATH  =  [
-                        '$WITH_MAMA/' + libdir,
-                        '$WITH_LIBEVENT/' + libdir,
-                        '$WITH_PROTON/' + libdir,
-                        '$WITH_ZMQ/' + libdir,
+                        '$WITH_MAMA/lib',
+                        '$WITH_MAMA/lib64',
+                        '$WITH_LIBEVENT/lib',
+                        '$WITH_LIBEVENT/lib64',
+                        '$WITH_PROTON/lib',
+                        '$WITH_PROTON/lib64',
+                        '$WITH_ZMQ/lib',
+                        '$WITH_ZMQ/lib64',
                         '.',
                     ],
     )
 else:
-    print "Unsupported platform: %s", env['PLATFORM']
+    print "Unsupported platform: %s" % env['PLATFORM']
     exit (1)
 
 if not env.GetOption('clean') and not env.GetOption('help'):
@@ -82,6 +83,8 @@ if not env.GetOption('clean') and not env.GetOption('help'):
     #if not conf.CheckLib ('mama'):
     #    print 'Cannot find MAMA install directory - check --with-mamainstall'
     #    Exit(1)
+
+    conf.Finish()
 
 env.Command ("endpointpool.c",
                  "$WITH_MAMA_SOURCE/mama/c_cpp/src/c/bridge/qpid/endpointpool.c",
