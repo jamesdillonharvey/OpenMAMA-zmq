@@ -27,3 +27,4 @@ script:
  - echo MAMA_INSTALL=$MAMA_INSTALL
  - find $MAMA_INSTALL
  - scons --with-mamasource=$MAMA_SOURCE --with-mamainstall=$MAMA_INSTALL
+ - cat config.log
