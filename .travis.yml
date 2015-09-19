@@ -1,0 +1,22 @@
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y scons git flex uuid-dev libevent-dev cmake git
+  - cd
+  - wget https://github.com/apache/qpid-proton/archive/0.10.tar.gz -O proton.tgz
+  - tar xvf proton.tgz
+  - cd qpid-proton*
+  - mkdir build
+  - cd build
+  - cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DSYSINSTALL_BINDINGS=ON -DBUILD_JAVA=OFF -DBUILD_PERL -DBUILD_PHP -DBUILD_PYTHON -DBUILD_RUBY
+  - sudo make install
+  - cd
+  - git clone https://github.com/fquinner/OpenMAMA.git
+  - cd OpenMAMA
+  - git checkout feature-omzmq
+  - scons product=mama middleware=qpid
+  - export MAMA_SOURCE=`pwd`
+  - export MAMA_INSTALL=`pwd`/openmama_install_*
+
+install:
+  - pwd
+  - ls
