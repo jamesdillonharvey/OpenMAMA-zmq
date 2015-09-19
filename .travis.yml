@@ -5,9 +5,11 @@ before_install:
   - wget https://github.com/apache/qpid-proton/archive/0.10.tar.gz -O proton.tgz
   - tar xvf proton.tgz
   - cd qpid-proton*
+  - pwd
+  - find .
   - mkdir build
   - cd build
-  - cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DSYSINSTALL_BINDINGS=ON -DBUILD_JAVA=OFF -DBUILD_PERL -DBUILD_PHP -DBUILD_PYTHON -DBUILD_RUBY
+  - cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DSYSINSTALL_BINDINGS=ON -DBUILD_JAVA=OFF -DBUILD_PERL=OFF -DBUILD_PHP=OFF -DBUILD_PYTHON=OFF -DBUILD_RUBY=OFF
   - sudo make install
   - cd
   - git clone https://github.com/fquinner/OpenMAMA.git
