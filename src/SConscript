@@ -7,6 +7,9 @@ env = Environment (
     WITH_LIBEVENT    = GetOption('with_libevent'),
     WITH_ZMQ         = GetOption('with_zmq'),
     TARGET_ARCH      = GetOption('target_arch'),
+    BUILD_TYPE       = GetOption('build_type'),
+    SHLIBPREFIX      = 'lib',
+    suffix           = '',
     CPPPATH  =  [
                     './src',
                     '$WITH_MAMA_SOURCE/common/c_cpp/src/c',
@@ -17,8 +20,23 @@ env = Environment (
                 ],
 )
 
+
 # Windows has a few differences
 if env['PLATFORM'] == "win32":
+    if env['BUILD_TYPE'] == 'dynamic' or env['BUILD_TYPE'] == None:
+        env.Append(
+            CCFLAGS     = ['/MD','/Ox'],
+            suffix      = 'md',
+            )
+    elif env['BUILD_TYPE'] == 'dynamic-debug':
+        env.Append(
+            CCFLAGS     = ['/MDd'],
+            suffix      = 'mdd',
+            )
+    else:
+        print "Unknown build type specified - exiting"
+        Exit(1)
+
     zmq_ver_abbrev = int(env['MSVC_VERSION'][:4].replace ('.', ''))
 
     zmq_match = []
@@ -29,22 +47,26 @@ if env['PLATFORM'] == "win32":
             str(zmq_ver_abbrev) + '-mt-*.lib')
         zmq_ver_abbrev -= 10
     if len(zmq_match) > 0:
-        zmq_lib = os.path.basename(zmq_match[0]).replace ('.lib', '')
+        # Should be two matches - second is debug
+        if not env['BUILD_TYPE'].endswith('debug'):
+            zmq_lib = os.path.basename(zmq_match[0]).replace ('.lib', '')
+        else:
+            zmq_lib = os.path.basename(zmq_match[1]).replace ('.lib', '')
     elif not env.GetOption('clean') and not env.GetOption('help'):
         print "Couldn't find any zeromq libraries! Check %s" % env['WITH_ZMQ']
         Exit (1)
 
     env.Append (
         LIBS     =  [
-                        'libmamacmd',
+                        'libmamac' + env['suffix'],
                         'uuid',
                         'Ws2_32',
                         'libevent_core',
-                        'libwombatcommonmd',
+                        'libwombatcommon' + env['suffix'],
                         zmq_lib,
                     ],
         LIBPATH  =  [
-                        '$WITH_MAMA/lib/dynamic',
+                        '$WITH_MAMA/lib/' + env['BUILD_TYPE'],
                         '$WITH_LIBEVENT/',
                         '$WITH_ZMQ/lib',
                         '.',
@@ -126,7 +148,7 @@ env.Command ("endpointpool.c",
 )
 
 libs = env.SharedLibrary (
-    'mamazmqimpl',
+    'mamazmqimpl' + env['suffix'],
     [
         'bridge.c',
         'endpointpool.c',
@@ -142,11 +164,10 @@ libs = env.SharedLibrary (
 )
 
 # Install the library to the top directory
-for lib in libs:
-    env.Command ("../" + str(lib),
-                 str(lib),
-                 [
-                     Copy("$TARGET", "$SOURCE"),
-                 ]
-    )
+env.Command ("../../" + str(libs[0]),
+             str(libs[0]),
+             [
+                 Copy("$TARGET", "$SOURCE"),
+             ]
+)
 
