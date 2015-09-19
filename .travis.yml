@@ -19,9 +19,11 @@ before_install:
   - cd OpenMAMA
   - git checkout feature-omzmq
   - scons product=mama middleware=qpid
-  - export MAMA_SOURCE=`pwd`
-  - export MAMA_INSTALL=`pwd`/openmama_install_*
+  - export MAMA_SOURCE=$(pwd)
+  - export MAMA_INSTALL=$MAMA_SOURCE/$(ls -1 | grep "openmama_install_*")
 
 script:
  - cd $SOURCE_DIR
+ - echo MAMA_INSTALL=$MAMA_INSTALL
+ - find $MAMA_INSTALL
  - scons --with-mamasource=$MAMA_SOURCE --with-mamainstall=$MAMA_INSTALL
