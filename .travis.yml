@@ -1,12 +1,15 @@
+language: c
+
 before_install:
+  - pwd
+  - export SOURCE_DIR=`pwd`
+  - ls
   - sudo apt-get update -qq
   - sudo apt-get install -y scons git flex uuid-dev libevent-dev cmake git
   - cd
   - wget https://github.com/apache/qpid-proton/archive/0.10.tar.gz -O proton.tgz
   - tar xvf proton.tgz
   - cd qpid-proton*
-  - pwd
-  - find .
   - mkdir build
   - cd build
   - cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DSYSINSTALL_BINDINGS=ON -DBUILD_JAVA=OFF -DBUILD_PERL=OFF -DBUILD_PHP=OFF -DBUILD_PYTHON=OFF -DBUILD_RUBY=OFF
@@ -19,6 +22,6 @@ before_install:
   - export MAMA_SOURCE=`pwd`
   - export MAMA_INSTALL=`pwd`/openmama_install_*
 
-install:
-  - pwd
-  - ls
+script:
+ - cd $SOURCE_DIR
+ - scons --with-mamasource=$MAMA_SOURCE --with-mamainstall=$MAMA_INSTALL
